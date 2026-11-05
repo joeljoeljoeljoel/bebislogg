@@ -1,4 +1,4 @@
-import { Activity, useState } from 'react';
+import { Activity, useLayoutEffect, useRef, useState } from 'react';
 import './App.css';
 import { BottomSheet } from './components/BottomSheet';
 import { type Tab, TabBar } from './components/TabBar';
@@ -26,6 +26,15 @@ export function App() {
   const [tab, setTab] = useState<Tab>('nu');
   const [guide] = useState(installGuide);
   const sheet = ui.sheet;
+  const screens = useRef<HTMLElement>(null);
+
+  // A tab always opens at the top. Each screen scrolls by itself, and a
+  // hidden one would otherwise come back where it was left.
+  const toTop = (behavior: ScrollBehavior) => {
+    for (const el of screens.current?.children ?? []) el.scrollTo({ top: 0, behavior });
+  };
+  useLayoutEffect(() => toTop('instant'), [tab]);
+  const selectTab = (next: Tab) => (next === tab ? toTop('smooth') : setTab(next));
 
   if (guide) {
     return (
@@ -38,7 +47,7 @@ export function App() {
   return (
     <div className="app">
       {/* Hidden tabs keep their state, e.g. which dygn are expanded in Dagbok. */}
-      <main className="screen">
+      <main ref={screens} className="screen">
         <Activity mode={tab === 'nu' ? 'visible' : 'hidden'}>
           <NowScreen now={now} />
         </Activity>
@@ -50,7 +59,7 @@ export function App() {
         </Activity>
       </main>
       {tab !== 'nu' && <UndoBar placement="tab" />}
-      <TabBar tab={tab} onChange={setTab} />
+      <TabBar tab={tab} onChange={selectTab} />
       {sheet && (
         <BottomSheet
           label={
