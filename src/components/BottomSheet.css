@@ -20,9 +20,23 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-lg);
   animation: sheet-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Set while dragged down; back to 0 springs it back up. */
+  transform: translateY(var(--sheet-y, 0px));
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet[data-dragging] {
+  transition: none;
 }
 .sheet:focus {
   outline: none;
+}
+.sheet-scrim[data-closing] {
+  background-color: transparent;
+  transition: background-color 0.2s ease-in;
+}
+.sheet-scrim[data-closing] .sheet {
+  transform: translateY(100%);
+  transition-timing-function: ease-in;
 }
 .sheet-handle {
   flex: none;
@@ -60,7 +74,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sheet,
-  .sheet-scrim {
+  .sheet-scrim,
+  .sheet-scrim[data-closing] {
     animation: none;
+    transition: none;
   }
 }
