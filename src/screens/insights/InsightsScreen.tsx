@@ -32,7 +32,7 @@ const PERIODS: [Period, string][] = [
   [28, '4 veckor'],
 ];
 
-/** The week table, insight cards, then the charts. */
+/** The BVC button, the week table, insight cards, then the charts. */
 export function InsightsScreen({ now }: { now: number }) {
   const m = useModel(now);
   const { settings } = useStore();
@@ -68,12 +68,12 @@ export function InsightsScreen({ now }: { now: number }) {
         <Seg label="Period" options={PERIODS} value={period} onChange={setPeriod} />
       </div>
 
-      <WeekTable m={m} />
-
       <button type="button" className="btn btn-secondary btn-block insights-bvc" onClick={() => ui.openSheet({ kind: 'bvc' })}>
         <ClipboardText size={18} />
         Sammanfattning till BVC
       </button>
+
+      <WeekTable m={m} />
 
       {cards.map((c) => (
         <div key={c.kicker} className="card insight" data-available={c.available}>
