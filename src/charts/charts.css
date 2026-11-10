@@ -55,6 +55,11 @@
   font-size: 11px;
   text-anchor: middle;
 }
+.dc-tick {
+  stroke: var(--bl-muted);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
 .dc-hand {
   stroke: var(--color-text);
   stroke-linecap: round;

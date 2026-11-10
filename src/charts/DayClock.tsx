@@ -104,15 +104,21 @@ export function DayClock({ now, sleeps, meals, night, small = false, dygn }: Pro
         );
       })}
       {!small &&
-        [0, 6, 12, 18].map((h) => {
+        Array.from({ length: 24 }, (_, h) => {
           // The time of the break takes the place of an hour label close to it.
-          if (!live && Math.abs(((h * 15 - seam + 540) % 360) - 180) < 20) return null;
-          const [x, y] = pt(h * 15, R - sw / 2 - 13);
-          return (
-            <text key={h} className="dc-label" x={x} y={y + 4}>
-              {pad(h)}
-            </text>
-          );
+          const label = h % 6 === 0 && (live || Math.abs(((h * 15 - seam + 540) % 360) - 180) >= 20);
+          if (label) {
+            const [x, y] = pt(h * 15, R - sw / 2 - 13);
+            return (
+              <text key={h} className="dc-label" x={x} y={y + 4}>
+                {pad(h)}
+              </text>
+            );
+          }
+          // A tick for every other hour, longer every three hours
+          const [x0, y0] = pt(h * 15, R - sw / 2 - 2);
+          const [x1, y1] = pt(h * 15, R - sw / 2 - (h % 3 === 0 ? 9 : 6));
+          return <line key={h} className="dc-tick" x1={x0} y1={y0} x2={x1} y2={y1} />;
         })}
       {live ? (
         <>
