@@ -5,11 +5,14 @@ import './theme/base.css';
 import { App } from './App';
 import { isStandalone } from './platform';
 import { captureInstallPrompt } from './pwa/install';
+import { keepUpright, preventZoom } from './screen';
 import { StoreProvider, loadInitialData } from './state/store';
 import { UIProvider } from './state/ui';
 
 async function start() {
   captureInstallPrompt();
+  preventZoom();
+  keepUpright();
   if (import.meta.env.DEV) {
     const { applyDevParams } = await import('./dev/devParams');
     await applyDevParams();

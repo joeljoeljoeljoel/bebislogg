@@ -13,6 +13,23 @@
     box-shadow: 0 0 0 1px var(--color-divider);
   }
 }
+/* A phone turned sideways: the app turns back to stand upright (src/screen.ts). */
+html[data-turn] .app {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 100dvh;
+  height: 100dvw;
+  max-width: none;
+  box-shadow: none;
+  transform: translate(-50%, -50%) rotate(var(--turn));
+}
+html[data-turn='90'] {
+  --turn: 90deg;
+}
+html[data-turn='-90'] {
+  --turn: -90deg;
+}
 
 .screen {
   position: absolute;

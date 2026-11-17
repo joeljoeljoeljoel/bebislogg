@@ -133,3 +133,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --tabbar-h: calc(56px + max(calc(var(--safe-bottom) - 8px), 12px));
 }
+/* Turned back from sideways (App.css), the Dynamic Island is to the left or right. */
+html[data-turn] {
+  --safe-top: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px), 8px);
+}

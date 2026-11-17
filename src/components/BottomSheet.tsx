@@ -1,4 +1,5 @@
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react';
+import { toApp } from '../screen';
 import './BottomSheet.css';
 
 /** A move further than this decides between dragging the sheet and scrolling it. */
@@ -49,8 +50,7 @@ function useDragDown(sheet: RefObject<HTMLDivElement | null>, onClose: () => voi
     const onMove = (e: TouchEvent) => {
       if (!g || g.mode === 'scroll') return;
       const t = e.touches[0];
-      const dx = t.clientX - g.x;
-      const dy = t.clientY - g.y;
+      const [dx, dy] = toApp(t.clientX - g.x, t.clientY - g.y);
       if (g.mode === 'wait') {
         if (Math.hypot(dx, dy) <= SLOP_PX) return;
         g.mode = g.top && dy > Math.abs(dx) ? 'drag' : 'scroll';

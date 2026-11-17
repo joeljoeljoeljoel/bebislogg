@@ -145,6 +145,11 @@
   -webkit-touch-callout: none;
   transition: transform 0.22s ease;
 }
+/* Turned sideways (App.css), browsers may read pan-y along the screen rather
+   than the row, so let both through; useSwipe holds the list still itself. */
+html[data-turn] .drow-main {
+  touch-action: pan-x pan-y;
+}
 .drow-main[data-type='sleep'] {
   background: var(--color-accent-900);
 }

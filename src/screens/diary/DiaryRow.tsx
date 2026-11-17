@@ -1,6 +1,7 @@
-import { type PointerEvent, useRef, useState } from 'react';
+import { type PointerEvent, useEffect, useRef, useState } from 'react';
 import { DropHalfBottom, Moon, Sun, Trash } from '@phosphor-icons/react';
 import type { DiaryEntry } from '../../domain/diary';
+import { toApp } from '../../screen';
 
 /** Where the swipe snaps: closed, or open with the delete button showing. */
 const OPEN_DX = -88;
@@ -17,21 +18,49 @@ interface SwipeState {
 /** Swipe left to reveal "Ta bort"; a tap opens the row, or closes an open swipe. */
 export function useSwipe(onTap: (id: string) => void) {
   const [state, setState] = useState<SwipeState | null>(null);
-  const gesture = useRef<{ id: string; x: number; dx0: number; moved: boolean; closedOther: boolean } | null>(null);
+  const gesture = useRef<{
+    id: string;
+    x: number;
+    y: number;
+    dx0: number;
+    moved: boolean;
+    /** Moved up or down first: a scroll, not a swipe */
+    scrolling: boolean;
+    closedOther: boolean;
+  } | null>(null);
+
+  // The list must not scroll while a row follows the finger. Not passive, and
+  // there from the start, so the browser waits for it.
+  useEffect(() => {
+    const hold = (e: TouchEvent) => gesture.current?.moved && e.preventDefault();
+    document.addEventListener('touchmove', hold, { passive: false });
+    return () => document.removeEventListener('touchmove', hold);
+  }, []);
 
   const handlers = (id: string) => ({
     onPointerDown: (e: PointerEvent) => {
       const closedOther = state !== null && state.id !== id;
       if (closedOther) setState(null);
-      gesture.current = { id, x: e.clientX, dx0: state?.id === id ? state.dx : 0, moved: false, closedOther };
+      gesture.current = {
+        id,
+        x: e.clientX,
+        y: e.clientY,
+        dx0: state?.id === id ? state.dx : 0,
+        moved: false,
+        scrolling: false,
+        closedOther,
+      };
     },
     onPointerMove: (e: PointerEvent<HTMLElement>) => {
       const g = gesture.current;
       if (!g || g.id !== id) return;
-      const dx = e.clientX - g.x;
-      if (!g.moved && Math.abs(dx) > SLOP_PX) {
-        g.moved = true;
-        e.currentTarget.setPointerCapture(e.pointerId);
+      const [dx, dy] = toApp(e.clientX - g.x, e.clientY - g.y);
+      if (!g.moved && !g.scrolling) {
+        if (Math.abs(dy) > SLOP_PX && Math.abs(dy) >= Math.abs(dx)) g.scrolling = true;
+        else if (Math.abs(dx) > SLOP_PX) {
+          g.moved = true;
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
       }
       if (g.moved) setState({ id, dx: Math.max(OPEN_DX, Math.min(0, g.dx0 + dx)), drag: true });
     },
