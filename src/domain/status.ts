@@ -26,12 +26,10 @@ export function nextSide(m: Model): Side | null {
   return last.side === 'V' ? 'H' : 'V';
 }
 
-/** "Senast vänster och höger 14:05, för 2 h 10 min sedan" */
+/** "Senast höger 14:20, för 1 h 55 min sedan": the very latest, also within a session */
 export function lastFeedText(m: Model): string {
-  const last = m.sessions.at(-1);
+  const last = m.meals.at(-1);
   if (!last) return `Ingen ${m.words.one} registrerad än`;
-  const what = last.meals
-    .map((x) => (x.type === 'bottle' ? `flaska ${x.ml} ml` : sideName(x.side)))
-    .join(' och ');
+  const what = last.type === 'bottle' ? `flaska ${last.ml} ml` : sideName(last.side);
   return `Senast ${what} ${hm(last.t)}, för ${dur(m.now - last.t)} sedan`;
 }

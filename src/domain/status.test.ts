@@ -46,11 +46,9 @@ describe('nextSide', () => {
 });
 
 describe('lastFeedText', () => {
-  it('describes the latest session', () => {
+  it('describes the latest feeding, also when it joined a session', () => {
     const events = [feed('2026-10-22 14:05', 'V'), feed('2026-10-22 14:20', 'H')];
-    expect(lastFeedText(model(events, '2026-10-22 16:15'))).toBe(
-      'Senast vänster och höger 14:05, för 2 h 10 min sedan',
-    );
+    expect(lastFeedText(model(events, '2026-10-22 16:15'))).toBe('Senast höger 14:20, för 1 h 55 min sedan');
   });
 
   it('includes the amount for bottles', () => {
